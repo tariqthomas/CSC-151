@@ -1,0 +1,235 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class greenbaypack {
+    private static final Scanner SCANNER = new Scanner(System.in);
+    private static final List<PackersPerson> DIRECTORY = createDirectory();
+
+    public static void main(String[] args) {
+        System.out.println("Welcome to the Green Bay Packers 2026 Season Directory");
+        System.out.println("Explore the people who make the Packers organization work.");
+
+        boolean running = true;
+        while (running) {
+            printMenu();
+            String choice = readLine("Choose an option: ");
+
+            switch (choice) {
+                case "1":
+                    browseByGroup();
+                    break;
+                case "2":
+                    searchDirectory();
+                    break;
+                case "3":
+                    viewProfileAndContact();
+                    break;
+                case "4":
+                    printAllPeople();
+                    break;
+                case "5":
+                    running = false;
+                    System.out.println("Thanks for visiting. Go Pack Go!");
+                    break;
+                default:
+                    System.out.println("Please choose a number from 1 to 5.");
+            }
+        }
+    }
+
+    private static void printMenu() {
+        System.out.println();
+        System.out.println("---------------- Packers Directory ----------------");
+        System.out.println("1. Browse players, coaches, or support staff");
+        System.out.println("2. Search the directory");
+        System.out.println("3. View a profile and write a fan message");
+        System.out.println("4. View everyone");
+        System.out.println("5. Exit");
+    }
+
+    private static void browseByGroup() {
+        System.out.println("\n1. Players\n2. Coaches\n3. Support staff");
+        String choice = readLine("Choose a group: ");
+        RoleGroup group;
+
+        switch (choice) {
+            case "1":
+                group = RoleGroup.PLAYER;
+                break;
+            case "2":
+                group = RoleGroup.COACH;
+                break;
+            case "3":
+                group = RoleGroup.SUPPORT_STAFF;
+                break;
+            default:
+                System.out.println("That is not a valid group.");
+                return;
+        }
+
+        System.out.println("\n--- " + group.getDisplayName() + " ---");
+        for (PackersPerson person : DIRECTORY) {
+            if (person.getGroup() == group) {
+                System.out.println(person.getSummary());
+            }
+        }
+    }
+
+    private static void searchDirectory() {
+        String searchTerm = readLine("Search by name, role, or position: ").toLowerCase();
+        boolean found = false;
+
+        for (PackersPerson person : DIRECTORY) {
+            if (person.matches(searchTerm)) {
+                System.out.println(person.getSummary());
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No directory entries matched '" + searchTerm + "'.");
+        }
+    }
+
+    private static void viewProfileAndContact() {
+        printAllPeople();
+        String selectedName = readLine("Enter the exact name to open a profile: ");
+        PackersPerson person = findByName(selectedName);
+
+        if (person == null) {
+            System.out.println("That person was not found. Use option 2 to search by a partial name.");
+            return;
+        }
+
+        System.out.println("\n" + person.getProfile());
+        String shouldMessage = readLine("Write a fan message? (y/n): ");
+        if (shouldMessage.equalsIgnoreCase("y")) {
+            String message = readLine("Message: ");
+            if (message.trim().isEmpty()) {
+                System.out.println("A blank message was not saved.");
+            } else {
+                System.out.println("Your message for " + person.getName()
+                        + " has been recorded as a fan message.");
+                System.out.println("Note: this classroom program does not send messages to the team.");
+            }
+        }
+    }
+
+    private static void printAllPeople() {
+        System.out.println("\n--- 2026 Season Directory ---");
+        for (PackersPerson person : DIRECTORY) {
+            System.out.println(person.getSummary());
+        }
+    }
+
+    private static PackersPerson findByName(String name) {
+        for (PackersPerson person : DIRECTORY) {
+            if (person.getName().equalsIgnoreCase(name.trim())) {
+                return person;
+            }
+        }
+        return null;
+    }
+
+    private static String readLine(String prompt) {
+        System.out.print(prompt);
+        return SCANNER.nextLine().trim();
+    }
+
+    private static List<PackersPerson> createDirectory() {
+        List<PackersPerson> people = new ArrayList<>();
+
+        people.add(new PackersPerson("Jordan Love", "Player", "Quarterback", "#10",
+                "Leads the offense and directs the passing game."));
+        people.add(new PackersPerson("Josh Jacobs", "Player", "Running Back", "#8",
+                "A powerful runner and experienced offensive leader."));
+        people.add(new PackersPerson("Jayden Reed", "Player", "Wide Receiver", "#11",
+                "A quick, versatile target in the receiving corps."));
+        people.add(new PackersPerson("Tucker Kraft", "Player", "Tight End", "#85",
+                "Contributes as a receiver and blocker."));
+        people.add(new PackersPerson("Rashan Gary", "Player", "Outside Linebacker", "#52",
+                "A disruptive pass rusher on the defensive front."));
+        people.add(new PackersPerson("Xavier McKinney", "Player", "Safety", "#29",
+                "A playmaking defensive back who helps organize the secondary."));
+
+        people.add(new PackersPerson("Matt LaFleur", "Coach", "Head Coach", "",
+                "Leads the team's preparation, strategy, and game-day decisions."));
+        people.add(new PackersPerson("Adam Stenavich", "Coach", "Offensive Coordinator", "",
+                "Works with the offense to build the weekly game plan."));
+        people.add(new PackersPerson("Jeff Hafley", "Coach", "Defensive Coordinator", "",
+                "Coordinates the defensive scheme and defensive staff."));
+
+        people.add(new PackersPerson("Brian Gutekunst", "Support Staff", "General Manager", "",
+                "Oversees football personnel decisions and roster construction."));
+        people.add(new PackersPerson("Russ Ball", "Support Staff", "Executive Vice President of Football Operations", "",
+                "Helps lead football operations, contracts, and team administration."));
+        people.add(new PackersPerson("Bryan Engel", "Support Staff", "Director of Player Engagement", "",
+                "Supports players' transition, development, and connection to the organization."));
+
+        return people;
+    }
+
+    private enum RoleGroup {
+        PLAYER("Players"),
+        COACH("Coaches"),
+        SUPPORT_STAFF("Support Staff");
+
+        private final String displayName;
+
+        RoleGroup(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
+    private static class PackersPerson {
+        private final String name;
+        private final String role;
+        private final String position;
+        private final String number;
+        private final String description;
+        private final RoleGroup group;
+
+        PackersPerson(String name, String role, String position, String number, String description) {
+            this.name = name;
+            this.role = role;
+            this.position = position;
+            this.number = number;
+            this.description = description;
+            this.group = role.equals("Player")
+                    ? RoleGroup.PLAYER
+                    : role.equals("Coach") ? RoleGroup.COACH : RoleGroup.SUPPORT_STAFF;
+        }
+
+        boolean matches(String searchTerm) {
+            return name.toLowerCase().contains(searchTerm)
+                    || role.toLowerCase().contains(searchTerm)
+                    || position.toLowerCase().contains(searchTerm);
+        }
+
+        String getSummary() {
+            String jersey = number.isEmpty() ? "" : " " + number;
+            return name + jersey + " - " + position + " (" + role + ")";
+        }
+
+        String getProfile() {
+            return "Name: " + name + "\n"
+                    + "Group: " + group.getDisplayName() + "\n"
+                    + "Role: " + position + "\n"
+                    + (number.isEmpty() ? "" : "Jersey: " + number + "\n")
+                    + "About: " + description;
+        }
+
+        String getName() {
+            return name;
+        }
+
+        RoleGroup getGroup() {
+            return group;
+        }
+    }
+}
